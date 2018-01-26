@@ -1,0 +1,18 @@
+
+<div class="col-sm-3 col-sm-offset-4 frame">
+  <ul></ul>
+
+  <div>
+
+    <div class="msj-rta macro" style="margin:auto">
+      <div class="text text-r" style="background:whitesmoke !important">
+        <div *ngFor="let prediccion of predicciones">
+          <button (click)="precion(prediccion);">{{prediccion}}</button>
+        </div>
+
+        <textarea name="" class="mytext" placeholder="Escribe tu mensaje" id="texto" cols="30" rows="10"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
