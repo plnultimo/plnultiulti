@@ -41,9 +41,18 @@ def texto_lista(request):
 def prediccion_lista(request):
     if request.method == 'POST':
         data = JSONParser().parse(request)
-        for i in range(1,100):
-             print(data["texto"])
-        return JSONResponse({data["texto"]:extractWordNet(data["texto"])})
+
+        serializer = SerieSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+
+        series = Serie.objects.all()
+        serializer = SerieSerializer(series, many=True)
+        markov = markovgen.Markov()
+
+        for x in serializer.data:
+            markov.addText(x["texto"])
+        return JSONResponse(markov.cachee)
 
     if request.method == 'GET':
         series = Serie.objects.all()
@@ -53,7 +62,6 @@ def prediccion_lista(request):
         for x in serializer.data:
             markov.addText(x["texto"])
         return JSONResponse(markov.cachee)
-
 
 @csrf_exempt
 def eliminar_texto(request):

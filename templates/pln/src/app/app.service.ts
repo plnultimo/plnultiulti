@@ -10,7 +10,7 @@ export class AppService {
 
   AgregarTexto(texto:String) {
     let params = {"texto": texto};
-
+    console.log("wwarren");
     return this._http.post(GlobalService.HOST + GlobalService.AgregarTexto,
       params,
       GlobalService.getHeadersOption())

@@ -18,10 +18,8 @@ export class AppComponent implements OnInit{
     return this._appService.AgregarTexto(Texto)
       .subscribe({
         next: (response) => {
-
           this.textoCompleto=response;
-          this.verificar();
-          console.error(response)
+          console.log(this.textoCompleto);
         },
         error: (err) => {
         },
@@ -34,7 +32,6 @@ export class AppComponent implements OnInit{
       .subscribe({
         next: (response) => {
           this.textoCompleto=response;
-          this.verificar()
         },
         error: (err) => {
         },
@@ -54,31 +51,17 @@ export class AppComponent implements OnInit{
           this.ServiceAgregarTexto(text);
                this.chat.push(
                  {
-                   t:                 $(".mytext").val(),
+                   t:$(".mytext").val(),
                    time:this.formatAMPM(new Date())
                  }
-
                );
         }
         $(".mytext").val('');
       }
     });
     $('.mytext').on('input',e=>{
-              if (text !== ""){
-
-              var text = $(".mytext").val();
-    text=text.split(" ");
-    text=text[text.length-1];
-                this.ServiceAgregarTexto(text);
-              }
      this.verificar();
-
     });
-    //-- Clear Chat
-    //-- Print Messages
-
-
-    //-- NOTE: No use time on insertChat.
   }
   formatAMPM(date) {
       var hours = date.getHours();
@@ -90,40 +73,15 @@ export class AppComponent implements OnInit{
       var strTime = hours + ':' + minutes + ' ' + ampm;
       return strTime;
     }
-shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
-
-  // Mientras queden elementos a mezclar...
-  while (0 !== currentIndex) {
-
-    // Seleccionar un elemento sin mezclar...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    // E intercambiarlo con el elemento actual
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-}
   verificar(){
     var text=$('.mytext').val();
-
     text=text.split(" ");
     text=text[text.length-1];
-
     if(this.textoCompleto[text]!=null){
       this.predicciones=[];
-      var k=0;
-      for(let x of this.textoCompleto[text]){
+      for(let x in this.textoCompleto[text]){
         this.predicciones.push(x);
-        console.log(x)
-          k++;
       }
-      this.shuffle(this.predicciones)
-      this.predicciones.splice(8,100)
     }else{
       this.predicciones=[];
     }
@@ -136,6 +94,5 @@ shuffle(array) {
     $('.mytext').val(aux);
     this.verificar();
     $('.mytext').focus();
-    this.verificar();
   }
 }
