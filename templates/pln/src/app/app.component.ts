@@ -31,6 +31,7 @@ export class AppComponent implements OnInit{
     return this._appService.ActualizarTexto()
       .subscribe({
         next: (response) => {
+          console.log(this.textoCompleto);
           this.textoCompleto=response;
         },
         error: (err) => {
