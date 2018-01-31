@@ -10,13 +10,18 @@ declare var $: any;
 export class AppComponent implements OnInit{
   textoCompleto;
   predicciones=[];
+
+  chat=[];
   constructor(private _appService: AppService){
   }
   ServiceAgregarTexto(Texto:String){
     return this._appService.AgregarTexto(Texto)
       .subscribe({
         next: (response) => {
+
           this.textoCompleto=response;
+          this.verificar();
+          console.error(response)
         },
         error: (err) => {
         },
@@ -29,6 +34,7 @@ export class AppComponent implements OnInit{
       .subscribe({
         next: (response) => {
           this.textoCompleto=response;
+          this.verificar()
         },
         error: (err) => {
         },
@@ -39,13 +45,42 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.Actualizar();
-    var me = {};
-    me["avatar"] = "https://lh6.googleusercontent.com/-lr2nyjhhjXw/AAAAAAAAAAI/AAAAAAAARmE/MdtfUmC0M4s/photo.jpg?sz=48";
 
-    var you = {};
-    you["avatar"] = "https://a11.t26.net/taringa/avatares/9/1/2/F/7/8/Demon_King1/48x48_5C5.jpg";
 
-    function formatAMPM(date) {
+    $(".mytext").on("keyup", e=>{
+      if (e.which == 13){
+        var text = $(".mytext").val();
+        if (text !== ""){
+          this.ServiceAgregarTexto(text);
+               this.chat.push(
+                 {
+                   t:                 $(".mytext").val(),
+                   time:this.formatAMPM(new Date())
+                 }
+
+               );
+        }
+        $(".mytext").val('');
+      }
+    });
+    $('.mytext').on('input',e=>{
+              if (text !== ""){
+
+              var text = $(".mytext").val();
+    text=text.split(" ");
+    text=text[text.length-1];
+                this.ServiceAgregarTexto(text);
+              }
+     this.verificar();
+
+    });
+    //-- Clear Chat
+    //-- Print Messages
+
+
+    //-- NOTE: No use time on insertChat.
+  }
+  formatAMPM(date) {
       var hours = date.getHours();
       var minutes = date.getMinutes();
       var ampm = hours >= 12 ? 'PM' : 'AM';
@@ -55,85 +90,52 @@ export class AppComponent implements OnInit{
       var strTime = hours + ':' + minutes + ' ' + ampm;
       return strTime;
     }
+shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
 
-    //-- No use time. It is a javaScript effect.
-    function insertChat(who, text, time = 0){
-      var control = "";
-      var date = formatAMPM(new Date());
+  // Mientras queden elementos a mezclar...
+  while (0 !== currentIndex) {
 
-      if (who == "me"){
+    // Seleccionar un elemento sin mezclar...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
 
-        control = '<li style="width:100%">' +
-          '<div class="msj macro">' +
-          '<div class="avatar"><img class="img-circle" style="width:50px;" src="'+ me["avatar"] +'" /></div>' +
-          '<div class="text text-l">' +
-          '<p>'+ text +'</p>' +
-          '<p><small>'+date+'</small></p>' +
-          '</div>' +
-          '</div>' +
-          '</li>';
-      }else{
-        control = '<li style="width:100%;">' +
-          '<div class="msj-rta macro">' +
-          '<div class="text text-r">' +
-          '<p>'+text+'</p>' +
-          '<p><small>'+date+'</small></p>' +
-          '</div>' +
-          '<  div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:50px;" src="'+you["avatar"]+'" /></div>' +
-          '</li>';
-      }
-      setTimeout(
-        function(){
-          $("ul").append(control);
-
-        }, time);
-
-    }
-
-
-
-    $(".mytext").on("keyup", e=>{
-      if (e.which == 13){
-        var text = $(".mytext").val();
-        alert(text);
-        if (text !== ""){
-          insertChat("me", text);
-          this.ServiceAgregarTexto(text);
-        }
-        $(".mytext").val('');
-      }
-    });
-    $('.mytext').on('input',e=>{
-     this.verificar();
-    });
-    //-- Clear Chat
-    //-- Print Messages
-
-
-    //-- NOTE: No use time on insertChat.
+    // E intercambiarlo con el elemento actual
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
   }
+
+  return array;
+}
   verificar(){
     var text=$('.mytext').val();
+
     text=text.split(" ");
     text=text[text.length-1];
+
     if(this.textoCompleto[text]!=null){
       this.predicciones=[];
-      for(let x in this.textoCompleto[text]){
+      var k=0;
+      for(let x of this.textoCompleto[text]){
         this.predicciones.push(x);
+        console.log(x)
+          k++;
       }
+      this.shuffle(this.predicciones)
+      this.predicciones.splice(8,100)
     }else{
       this.predicciones=[];
     }
   }
   title = 'app';
   precion(texto){
-
     this.predicciones=[];
     var aux=$('.mytext').val();
     aux=aux+" "+texto;
     $('.mytext').val(aux);
     this.verificar();
     $('.mytext').focus();
+    this.verificar();
   }
-
 }

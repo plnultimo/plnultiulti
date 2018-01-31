@@ -8,7 +8,9 @@ from rest_framework.parsers import JSONParser
 from series.models import Serie
 from series.serializers import SerieSerializer
 from series import markovgen
-
+import os
+from webflix.settings import PROJECT_ROOT
+from nltk.corpus import wordnet as wn
 
 class JSONResponse(HttpResponse):
     """
@@ -39,18 +41,9 @@ def texto_lista(request):
 def prediccion_lista(request):
     if request.method == 'POST':
         data = JSONParser().parse(request)
-
-        serializer = SerieSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-
-        series = Serie.objects.all()
-        serializer = SerieSerializer(series, many=True)
-        markov = markovgen.Markov()
-
-        for x in serializer.data:
-            markov.addText(x["texto"])
-        return JSONResponse(markov.cachee)
+        for i in range(1,100):
+             print(data["texto"])
+        return JSONResponse({data["texto"]:extractWordNet(data["texto"])})
 
     if request.method == 'GET':
         series = Serie.objects.all()
@@ -60,7 +53,6 @@ def prediccion_lista(request):
         for x in serializer.data:
             markov.addText(x["texto"])
         return JSONResponse(markov.cachee)
-
 
 
 @csrf_exempt
@@ -87,7 +79,13 @@ def prediccion(request):
             return JSONResponse(markov.cachee[data["texto"]])
         else:
             return HttpResponse(status=404)
-
+def deleteall():
+    for i in  range(0,100):
+        try:
+            serie =Serie.objects.get(pk=i)
+        except:
+            continue
+        serie.delete()
 @csrf_exempt
 def serie_list(request):
     if request.method == 'GET':
@@ -115,8 +113,13 @@ def serie_listando(request):
         serializer = SerieSerializer(series, many=True)
         return JSONResponse(serializer.data)
 
-
-
+def extractWordNet(w):
+    print("dfsfs");
+    x=[];
+    for synset in wn.synsets(w):
+        for lemma in synset.lemmas():
+            x.append(lemma.name())
+    return x
 @csrf_exempt
 def serie_detail(request, pk):
 #    try:
@@ -143,4 +146,6 @@ def serie_detail(request, pk):
 #    elif request.method == 'DELETE':
 #        serie.delete()
 #        return HttpResponse(status=204)
+
+
 
